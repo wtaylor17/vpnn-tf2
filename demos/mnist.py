@@ -23,6 +23,8 @@ parser.add_argument('--batch_size', type=int, default=64, help='batch size to us
 parser.add_argument('--tensorboard', action='store_true', help='to use tensorboard')
 parser.add_argument('--name', type=str, default='mnistvpnn', help='name of model (checkpoint and logs)')
 parser.add_argument('--save_checkpoints', action='store_true', help='if present save the model per epoch')
+parser.add_argument('--trainable_M', action='store_true', help='if present make cheby activations trainable')
+parser.add_argument('--cheby_M', type=float, default=1.3, help='initial cheby M (if not trainable)')
 
 args = parser.parse_args()
 
@@ -61,7 +63,9 @@ if __name__ == '__main__':
                  use_diagonals=not args.nodiag,
                  diagonal_fn=args.diagonal_fn,
                  hidden_activation=args.hidden_activation,
-                 output_activation=args.hidden_activation if args.dense else 'softmax')
+                 output_activation=args.hidden_activation if args.dense else 'softmax',
+                 trainable_M=args.trainable_M,
+                 M_init=args.cheby_M)
     if args.dense:
         output = tf.keras.layers.Dense(10, activation='softmax')(model.output)
     else:
