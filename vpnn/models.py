@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from typing import List, Callable, Union, Tuple
+from typing import List, Callable, Union
 
 from .layers import Rotation, Permutation, Diagonal, Bias, SVDDownsize
 
@@ -19,6 +19,24 @@ def vpnn(input_dim: int = 2,
          diagonal_fn: Callable = None,
          output_activation: Union[str, Callable] = 'linear',
          hidden_activation: Union[str, Callable] = 'relu'):
+    """
+    builds a VPNN model (just volume preserving kernels)
+    :param input_dim: the input dimension to the model
+    :param n_layers: the number of hidden layers of the model
+    :param n_rotations: the number of rotations to use (k/2 if you read the paper)
+    :param seeds: to keep permutations repeatable and loadable
+    :param theta_initializer: initializer for angles of rotations
+    :param t_initializer: initializer for t parameter of diagonals
+    :param bias_initializer: initializer for bias vectors
+    :param output_dim: if not None, the output dimension for an SVDDownsize
+    :param use_bias: if False, no bias vectors are used
+    :param use_permutations: if False, no permutations are used
+    :param use_diagonals: if False, no diagonals are used
+    :param diagonal_fn: a callable for the diagonal
+    :param output_activation: activation for the output layer (the SVD if applicable)
+    :param hidden_activation: activation for hidden layers (all but the last if no SVD)
+    :return: a tf.keras.Model
+    """
 
     if input_dim % 2 != 0:
         raise ValueError('input dimension must be even')
