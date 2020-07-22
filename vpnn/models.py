@@ -3,6 +3,7 @@ import numpy as np
 from typing import List, Callable, Union
 
 from .layers import Rotation, Permutation, Diagonal, Bias, SVDDownsize
+from . import activations
 
 
 def vpnn(input_dim: int = 2,
@@ -18,13 +19,19 @@ def vpnn(input_dim: int = 2,
          use_diagonals: bool = True,
          diagonal_fn: Callable = None,
          output_activation: Union[str, Callable] = 'linear',
-         hidden_activation: Union[str, Callable] = 'relu'):
+         hidden_activation: Union[str, Callable] = 'relu',
+         M_initializer='ones',
+         M_init=1.3,
+         trainable_M=False):
     """
     builds a VPNN model (just volume preserving kernels)
+    :param M_initializer: passed to `Chebyshev` constructors
+    :param M_init: passed to `Chebyshev` constructors
+    :param trainable_M: passed as `trainable` to `Chebyshev` constructors
     :param input_dim: the input dimension to the model
     :param n_layers: the number of hidden layers of the model
     :param n_rotations: the number of rotations to use (k/2 if you read the paper)
-    :param seeds: to keep permutations repeatable and loadable
+    :param seeds: to keep permutations repeatable and loadable. randomized if none
     :param theta_initializer: initializer for angles of rotations
     :param t_initializer: initializer for t parameter of diagonals
     :param bias_initializer: initializer for bias vectors
@@ -64,9 +71,15 @@ def vpnn(input_dim: int = 2,
         if use_bias:
             current_output = Bias(bias_initializer=bias_initializer)(current_output)
         if k != n_layers - 1:
-            current_output = tf.keras.activations.get(hidden_activation)(current_output)
+            current_output = activations.get(hidden_activation,
+                                             trainable=trainable_M,
+                                             M_init=M_init,
+                                             M_initializer=M_initializer)(current_output)
 
     if output_dim:
         current_output = SVDDownsize(output_dim)(current_output)
-    current_output = tf.keras.activations.get(output_activation)(current_output)
+    current_output = activations.get(hidden_activation,
+                                     trainable=trainable_M,
+                                     M_init=M_init,
+                                     M_initializer=M_initializer)(current_output)
     return tf.keras.Model(input_tensor, current_output)

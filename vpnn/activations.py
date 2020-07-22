@@ -32,3 +32,11 @@ class Chebyshev(tf.keras.layers.Layer):
 
     def call(self, inputs, eps=1e-5, **kwargs):
         return chebyshev(inputs, M=self.M, eps=eps)
+
+
+def get(activation, **kwargs):
+    if isinstance(activation, tf.keras.layers.Layer):
+        return activation
+    elif activation == 'chebyshev':
+        return Chebyshev(**kwargs)
+    return tf.keras.activations.get(activation)
