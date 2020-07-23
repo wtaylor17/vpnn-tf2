@@ -1,6 +1,6 @@
 # repo-specific
-demos/logs
-demos/models
+demos/*/logs
+demos/*/models
 .idea
 
 # Byte-compiled / optimized / DLL files

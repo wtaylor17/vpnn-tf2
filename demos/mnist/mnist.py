@@ -1,6 +1,5 @@
 import tensorflow as tf
 import argparse
-import logging
 
 from vpnn import vpnn
 
@@ -25,6 +24,7 @@ parser.add_argument('--name', type=str, default='mnistvpnn', help='name of model
 parser.add_argument('--save_checkpoints', action='store_true', help='if present save the model per epoch')
 parser.add_argument('--trainable_M', action='store_true', help='if present make cheby activations trainable')
 parser.add_argument('--cheby_M', type=float, default=1.3, help='initial cheby M (if not trainable)')
+parser.add_argument('--momentum', type=float, default=0.0, help='optimizer momentum if applicable')
 
 args = parser.parse_args()
 
@@ -66,6 +66,12 @@ if __name__ == '__main__':
                  output_activation=args.hidden_activation if args.dense else 'softmax',
                  trainable_M=args.trainable_M,
                  M_init=args.cheby_M)
+    if args.optimizer == 'rmsprop':
+        optimizer = tf.optimizers.RMSprop(momentum=args.momentum)
+    elif args.optimizer == 'sgd':
+        optimizer = tf.optimizers.SGD(momentum=args.momentum)
+    else:
+        optimizer = args.optimizer
     if args.dense:
         output = tf.keras.layers.Dense(10, activation='softmax')(model.output)
     else:
@@ -88,6 +94,8 @@ if __name__ == '__main__':
                                                         tf.keras.metrics.categorical_accuracy],
                                                xdata=x_test, ydata=y_test))
 
+    model.summary()
+    print('optimizer =', optimizer)
     model.fit(x_train, y_train,
               batch_size=args.batch_size,
               epochs=args.epochs,

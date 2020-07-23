@@ -78,7 +78,7 @@ def vpnn(input_dim: int = 2,
 
     if output_dim:
         current_output = SVDDownsize(output_dim)(current_output)
-    current_output = activations.get(hidden_activation,
+    current_output = activations.get(output_activation,
                                      trainable=trainable_M,
                                      M_init=M_init,
                                      M_initializer=M_initializer)(current_output)
