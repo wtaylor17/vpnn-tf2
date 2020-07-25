@@ -46,8 +46,8 @@ python mnist.py --layers 2 --rotations 8 --epochs 30 --batch_size 64 --tensorboa
 - [x] implement permutation sublayer
 - [x] implement diagonal sublayer
 - [x] implement bias sublayer
-- [ ] implement chebyshev activation
-- [ ] implement chebyshev variants
+- [x] implement chebyshev activation
+- [x] implement trainable chebyshev
 - [x] make MNIST demo
 - [ ] compare with paper results on MNIST
 - [ ] make IMDB demo
