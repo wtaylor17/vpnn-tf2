@@ -49,7 +49,7 @@ python mnist.py --layers 2 --rotations 8 --epochs 30 --batch_size 64 --tensorboa
 - [x] implement chebyshev activation
 - [x] implement trainable chebyshev
 - [x] make MNIST demo
-- [ ] compare with paper results on MNIST
+- [x] compare with paper results on MNIST ([see the notebook here](https://colab.research.google.com/drive/1XunWlmccY4IIMwMtCHTPJWG6idgRKGvQ?usp=sharing))
 - [ ] make IMDB demo
 - [ ] compare with paper results on IMDB
 
