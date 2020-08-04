@@ -142,25 +142,57 @@ class SVDDownsize(tf.keras.layers.Layer):
 
 
 class KernelWrapper(tf.keras.layers.Layer):
+    """
+    A wrapper for keras layers that, for a layer L
+    and input x of dimension n, computes dot(L(I_n), x)
+    instead of L(x). Mostly for vpnns, where the kernel V
+    is not implemented as a matrix but may be desired to sometimes
+    be treated as such.
+    """
     def __init__(self, layer, clip_args=None, **kwargs):
+        """
+        creates a kernel wrapper
+        :param layer: the layer object to wrap
+        :param clip_args: arguments passed to tf.clip_by_value if not None
+        :param kwargs: passed to super constructor
+        """
         self.layer = layer
         self.clip_args = clip_args
         self.units = None
         super().__init__(**kwargs)
 
     def get_config(self):
+        """
+        implements the method of the super class + the layer and clip args
+        """
         conf = super().get_config()
-        conf.update({'layer': self.layer})
+        conf.update({'layer': self.layer, 'clip_args': self.clip_args})
         return conf
 
     def compute_output_shape(self, input_shape):
+        """
+        computes the output shape of the model
+        :param input_shape: input shape to the model
+        :return: the result of the wrapped layer calling the same method
+        """
         return self.layer.compute_output_shape(input_shape)
 
     def build(self, input_shape):
+        """
+        builds the wrapped layer
+        :param input_shape: input shape for wrapped layer
+        """
         self.layer.build(input_shape)
         super().build(input_shape)
 
     def call(self, inputs, **kwargs):
+        """
+        computes the transformation dot(inputs, self.layer(eye(n)))
+        along with appropriate element-wise clipping
+        :param inputs: inputs to the model
+        :param kwargs: unused
+        :return: a tensor representing the result
+        """
         kernel = self.layer(tf.eye(tf.shape(inputs)[-1]))
         if self.clip_args is not None:
             kernel = tf.clip_by_value(kernel, *self.clip_args)
