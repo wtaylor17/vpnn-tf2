@@ -139,3 +139,29 @@ class SVDDownsize(tf.keras.layers.Layer):
 
     def call(self, inputs, **kwargs):
         return tf.matmul(inputs, self.Z)
+
+
+class KernelWrapper(tf.keras.layers.Layer):
+    def __init__(self, layer, clip_args=None, **kwargs):
+        self.layer = layer
+        self.clip_args = clip_args
+        self.units = None
+        super().__init__(**kwargs)
+
+    def get_config(self):
+        conf = super().get_config()
+        conf.update({'layer': self.layer})
+        return conf
+
+    def compute_output_shape(self, input_shape):
+        return self.layer.compute_output_shape(input_shape)
+
+    def build(self, input_shape):
+        self.layer.build(input_shape)
+        super().build(input_shape)
+
+    def call(self, inputs, **kwargs):
+        kernel = self.layer(tf.eye(tf.shape(inputs)[-1]))
+        if self.clip_args is not None:
+            kernel = tf.clip_by_value(kernel, *self.clip_args)
+        return tf.matmul(inputs, kernel)
