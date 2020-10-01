@@ -9,7 +9,6 @@ from . import activations
 def vpnn(input_dim: int = 2,
          n_layers: int = 1,
          n_rotations: int = 1,
-         seeds: List[int] = None,
          theta_initializer: str = 'uniform',
          t_initializer: str = 'uniform',
          bias_initializer: str = 'uniform',
@@ -31,7 +30,6 @@ def vpnn(input_dim: int = 2,
     :param input_dim: the input dimension to the model
     :param n_layers: the number of hidden layers of the model
     :param n_rotations: the number of rotations to use (k/2 if you read the paper)
-    :param seeds: to keep permutations repeatable and loadable. randomized if none
     :param theta_initializer: initializer for angles of rotations
     :param t_initializer: initializer for t parameter of diagonals
     :param bias_initializer: initializer for bias vectors
@@ -48,16 +46,13 @@ def vpnn(input_dim: int = 2,
     if input_dim % 2 != 0:
         raise ValueError('input dimension must be even')
 
-    if not seeds:
-        seeds = np.random.randint(0, high=10000, size=(2 * n_rotations,)).tolist()
-
     input_tensor = tf.keras.Input(shape=(input_dim,))
     current_output = input_tensor
 
     for k in range(n_layers):
         for j in range(n_rotations):
             if use_permutations:
-                current_output = Permutation(seed=seeds[j])(current_output)
+                current_output = Permutation()(current_output)
             current_output = Rotation(theta_initializer=theta_initializer)(current_output)
 
         if use_diagonals:
@@ -65,7 +60,7 @@ def vpnn(input_dim: int = 2,
 
         for j in range(n_rotations):
             if use_permutations:
-                current_output = Permutation(seed=seeds[j + n_rotations])(current_output)
+                current_output = Permutation()(current_output)
             current_output = Rotation(theta_initializer=theta_initializer)(current_output)
 
         if use_bias:

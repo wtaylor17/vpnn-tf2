@@ -3,14 +3,14 @@ import numpy as np
 
 
 class Permutation(tf.keras.layers.Layer):
-    def __init__(self, seed=None, **kwargs):
+    def __init__(self, perm=None, **kwargs):
         super().__init__(**kwargs)
-        self.permutation = None
+        self.permutation = perm
         self.seed = seed
 
     def get_config(self):
         conf = super().get_config()
-        conf.update({'seed': self.seed})
+        conf.update({'perm': self.permutation})
         return conf
 
     def compute_output_shape(self, input_shape):
@@ -18,9 +18,8 @@ class Permutation(tf.keras.layers.Layer):
 
     def build(self, input_shape):
         dim = input_shape[-1]
-        if self.seed:
-            np.random.seed(self.seed)
-        self.permutation = np.random.permutation(dim)
+        if not self.permutation:
+            self.permutation = np.random.permutation(dim)
         super().build(input_shape)
 
     def call(self, inputs, **kwargs):
