@@ -6,7 +6,6 @@ class Permutation(tf.keras.layers.Layer):
     def __init__(self, perm=None, **kwargs):
         super().__init__(**kwargs)
         self.permutation = perm
-        self.seed = seed
 
     def get_config(self):
         conf = super().get_config()
