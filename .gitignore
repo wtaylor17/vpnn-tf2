@@ -1,3 +1,5 @@
+.vscode/
+
 # repo-specific
 demos/*/logs
 demos/*/models
