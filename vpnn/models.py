@@ -41,10 +41,8 @@ def vpnn(input_dim: int = None,
     :param hidden_activation: activation for hidden layers (all but the last if no SVD)
     :return: a tf.keras.Model
     """
-
     model = tf.keras.Sequential()
-    # Add an input layer if they want one
-    if(input_dim):
+    if input_dim:
         model.add(tf.keras.layers.Input((input_dim,)))
 
     for k in range(n_layers):
