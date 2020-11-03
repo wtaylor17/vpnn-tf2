@@ -7,8 +7,9 @@ def chebyshev(x, M=1.3, eps=1e-5):
     r = tf.sqrt(tf.square(xs) + tf.square(ys)) + eps
     M_theta = M * tf.acos(tf.clip_by_value(xs / r, -1, 1))
     cos, sin = tf.cos(M_theta), tf.sin(M_theta)
-    evens = r / tf.sqrt(M) * cos
-    odds = r / tf.sqrt(M) * sin * tf.sign(ys)
+    rm = r / tf.sqrt(M)
+    evens = rm * cos
+    odds = rm * sin * tf.sign(ys)
     return tf.reshape(tf.stack([evens, odds], axis=-1), tf.shape(x))
 
 
